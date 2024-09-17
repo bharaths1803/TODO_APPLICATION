@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="/styles.css" rel="stylesheet">
+  <title>Login Page</title>
+</head>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.7.7/axios.min.js"></script>
+<script>
+  async function signup(){
+    const username = document.getElementById("signup-username").value;
+    const password = document.getElementById("signup-password").value;
+
+    const response = await axios.post("http://localhost:3000/signup",{
+      username : username,
+      password : password
+    }
+    );
+
+    const alertMessage = response.data.message;
+    alert(alertMessage);
+  }
+
+  async function signin(){
+    const username = document.getElementById("signin-username").value;
+    const password = document.getElementById("signin-password").value;
+
+    const response = await axios.post("http://localhost:3000/signin",{
+      username : username,
+      password : password
+    }
+    );
+
+    const tokeni = response.data.token;
+
+    localStorage.setItem("token", tokeni);
+
+    if(response.data.message) {
+      alert("You have to sign up first");
+    }
+    else {
+      const isVerified = await verifyUserInformation();
+      console.log("Is verified flag " + isVerified);
+      if(isVerified){
+        const randomi = "Verified";
+        const response = await axios.get(`http://localhost:3000/?randomi=${randomi}`);
+        document.open();
+        document.write(response.data);
+        document.close();
+      }
+      else{
+        alert("Unauthorized user");
+      }
+    }
+  }
+
+
+  async function verifyUserInformation() {
+    const tokeni = localStorage.getItem("token");
+    const response = await axios.get("http://localhost:3000/verify", {
+      headers : {
+        token : tokeni
+      }
+    });
+
+    if(response.data.message == "User authorized"){
+      return true;
+    }
+    else{
+      return false;
+    }
+  }
+
+
+</script>
+<body>
+  <div class="container">
+    <div id = "signup-div" class="content-div">
+      <div>Signup</div>
+      <div><input id = "signup-username" type="text" name="username" placeholder="Username"></div>
+      <div><input id = "signup-password" type="password" name="password" placeholder="password"></div>
+      <div onclick="signup()" class="submit-button">Submit</div>
+    </div>
+
+    <div id = "signin-div" class="content-div">
+      <div>Signin</div>
+      <div><input id = "signin-username" type="text" name="username" placeholder="Username"></div>
+      <div><input id = "signin-password" type="password" name="password" placeholder="password"></div>
+      <div onclick = "signin()" class="submit-button">Submit</div>
+    </div>
+
+  </div>
+</body>
+</html>

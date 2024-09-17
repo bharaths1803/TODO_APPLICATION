@@ -1,0 +1,89 @@
+body {
+  font-family: 'Poppins', sans-serif;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  background-color: #f6f7fb;
+}
+
+h1 {
+  font-size: 2.5em;
+  font-weight: bold;
+  color: #333;
+  text-align: center;
+}
+
+input[type="text"],.tasksdiv {
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  padding: 10px;
+  font-size: 1em;
+}
+
+.tasksdiv span{
+  background-color: white;
+  border: none;
+  border-radius: 0px;
+  padding: 0px;
+  box-shadow: none;
+  color: #333;
+  text-align: center;
+}
+
+button,span {
+  border-radius: 8px;
+  padding: 10px 15px;
+  font-size: 1em;
+  margin-left: 5px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  border:2px solid rgba(0, 0, 0, 0.1);
+}
+
+button.add {
+  background-color: #3a86ff;
+  color: #ffffff;
+}
+
+button.delete,button.completed,button.edit,button.cancel,span {
+  background-color: #ff6b6b;
+  color: #ffffff;
+}
+
+button:hover {
+  cursor: pointer;
+  opacity: 0.9;
+}
+
+
+.horizontal-center{
+  display: flex;
+  justify-content: center;
+  padding: 10px;
+}
+
+.container{
+  width: 1200px;
+  margin: 0px auto;
+}
+
+button.save {
+  background-color: #4caf50;
+  color: #ffffff;
+}
+
+.strikeout{
+  text-decoration: line-through;
+}
+
+.outside-box{
+  border-radius: 14px;
+  background-color: #fff;
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+  overflow: auto;
+}
+
+
+button.logout{
+  background-color: #3a86ff;
+  color: #ffffff;
+}

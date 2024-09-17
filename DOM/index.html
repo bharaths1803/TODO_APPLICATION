@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DAY WINNER</title>
+  <link rel="stylesheet" href = "/styles.css?randomi='Verified'">
+</head>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.7.7/axios.min.js"></script>
+<script>
+
+async function addTodo(){
+  let taski = document.querySelector("input").value;
+  if(taski != ""){
+  const todos = await axios.post("http://localhost:3000/add", {
+    task : taski,
+    completed : false
+  });
+  render(todos.data);
+  }
+}
+
+
+async function clearTodos(hasCompleted){
+  const todos = await axios.delete("http://localhost:3000/removeall");
+  render(todos.data);
+}
+
+async function deleteTodo(idx){
+
+  const todos = await axios.delete("http://localhost:3000/remove", {
+    data : {
+      idx : idx
+    }
+  });
+
+  render(todos.data);
+}
+
+
+
+function cancelEditTodo(idx, task, completed){
+  const todotask = {
+    task : task,
+    completed : completed
+  }
+  let oldDiv = createTodoComponent(todotask, idx);
+
+  let topDiv = document.getElementById("todos");
+  const newDiv = topDiv.children[idx];
+
+  topDiv.replaceChild(oldDiv, newDiv);
+}
+
+async function saveEditTodo(idx){
+  const editBox = document.getElementById("" + idx);
+  const todos = {
+    task: editBox.value,
+    completed : false
+  };
+
+  await axios.put("http://localhost:3000/update", {
+    task: editBox.value,
+    completed : false,
+    idx : idx
+  });
+
+  let oldDiv = createTodoComponent(todos, idx);
+
+  let topDiv = document.getElementById("todos");
+  const newDiv = topDiv.children[idx];
+
+  topDiv.replaceChild(oldDiv, newDiv);
+}
+
+function editTodo(idx, task, completed){
+  console.log("In starting");
+  const topDiv = document.getElementById("todos");
+  const oldDiv = topDiv.children[idx];
+
+  const newDivEl = document.createElement("div");
+
+  const editBox = document.createElement("input");
+  editBox.setAttribute("type", "text");
+  editBox.value = task;
+  editBox.setAttribute("id", idx);
+
+  const cancelButton  = document.createElement("button");
+  cancelButton.innerHTML = "Cancel";
+  cancelButton.setAttribute("onclick", `cancelEditTodo('${idx}','${task}','${completed}')`);
+  cancelButton.className = "cancel";
+
+  const saveButton  = document.createElement("button");
+  saveButton.innerHTML = "Save";
+  saveButton.setAttribute("onclick", "saveEditTodo(" + idx + ")");
+  saveButton.className = "save";
+
+  newDivEl.appendChild(editBox);
+  newDivEl.appendChild(cancelButton);
+  newDivEl.appendChild(saveButton);
+
+  newDivEl.className = "horizontal-center";
+
+  topDiv.replaceChild(newDivEl,oldDiv);
+
+}
+
+
+
+async function markTodo(idx, task, completed){
+  await axios.put("http://localhost:3000/mark",{
+    idx : idx,
+    completed : true
+  });
+
+  let todotask = {
+    task : task,
+    completed : true
+  };
+
+  let oldDiv = createTodoComponent(todotask, idx);
+
+  let topDiv = document.getElementById("todos");
+  const newDiv = topDiv.children[idx];
+
+  topDiv.replaceChild(oldDiv, newDiv);
+  
+  }
+
+
+function createTodoComponent(todo, idx){
+
+  const spanEl = document.createElement("span");
+  const divSpan = document.createElement("div");
+  const delButton = document.createElement("button");
+  const editButton = document.createElement("button");
+  const finishedButton  = document.createElement("button");
+
+  spanEl.innerHTML = todo.task;
+  if(todo.completed === true){
+    spanEl.className = "strikeout";
+  }
+ 
+  divSpan.appendChild(spanEl);
+  divSpan.className = "tasksdiv";
+
+  delButton.innerHTML = "Delete";
+  delButton.setAttribute("onclick", "deleteTodo(" + idx + ")");
+  delButton.className = "delete";
+
+  editButton.innerHTML = "Edit";
+  editButton.setAttribute("onclick", `editTodo('${idx}','${todo.task}','${todo.completed}')`);
+  editButton.className = "edit";
+
+  finishedButton.innerHTML = "Done";
+  finishedButton.setAttribute("onclick", `markTodo('${idx}','${todo.task}','${todo.completed}')`);
+  finishedButton.className = "completed";
+
+  const divEl = document.createElement("div");
+
+  divEl.appendChild(divSpan);
+  divEl.appendChild(editButton);
+  divEl.appendChild(delButton);
+  divEl.appendChild(finishedButton);
+
+  divEl.className = "horizontal-center";
+
+  return divEl;
+}
+
+
+async function render(todos){
+  if(!todos){
+    const response = await axios.get("http://localhost:3000/view");
+    todos = response.data;
+  }
+  document.querySelector("#todos").innerHTML = "";
+  for(let i  = 0; i < todos.length; i++){
+    let todo = todos[i];
+    console.log("Hi");
+    const ele = createTodoComponent(todo, i);
+    document.querySelector("#todos").appendChild(ele);
+  }
+}
+
+async function logout(){
+  localStorage.removeItem("token");
+  const response = await axios.get("http://localhost:3000");
+  document.open();
+  document.write(response.data);
+  document.close();
+}
+
+render();
+</script>
+
+<body>
+
+  <div class="outside-box">
+    <div class="container">
+      <div class="horizontal-center">
+        <div>
+          <h1>Turn To-Dos into Dones!</h1>
+        </div>
+      </div>
+      <div class="horizontal-center">
+        <input type="text">
+        <button class="add" onclick="addTodo()">Add todo!</button>
+      </div>
+    </div>
+
+    <div id="todos"></div>
+
+    <div class="container">
+      <div class="horizontal-center">
+        <button class="add" onclick="clearTodos()">Clear All Tasks</button>
+      </div>
+    </div>
+
+    <div class="container">
+      <div class="horizontal-center">
+        <button class="logout" onclick="logout()">Logout</button>
+      </div>
+    </div>
+
+  </div>
+
+
+
+
+</body>
+
+</html>
